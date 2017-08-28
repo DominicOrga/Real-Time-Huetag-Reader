@@ -5,7 +5,7 @@
 #endif
 
 #include <vector>
-#include <opencv2/core.hpp>
+#include "opencv2\opencv.hpp"
 
 namespace orga { class Lab; }
 
@@ -27,7 +27,7 @@ namespace orga {
 		/// <param name='image'> The image containing the marker. </param>
 		/// <param name='dataCellCoords'> The data cell coordinates of the marker. </param>
 		/// <param name='outLabArray'> The list where the extracted lab values will be stored. </param>
-		void extractDataCellLabColors(cv::Mat* image, std::vector<cv::Point*>* dataCellCoords, OUT std::vector<orga::Lab>& outLabArray);
+		void extractDataCellLabColors(cv::Mat* image, std::vector<cv::Point*> dataCellCoords, OUT std::vector<orga::Lab>& outLabArray);
 
 		/// <summary>
 		/// Identifies the Lab color whether it is red, green, yellow or blue by calculating their distance using euclidean distance algorithm.
@@ -66,7 +66,7 @@ namespace orga {
 	/// <param name='squareContour'> The square contour in which the data-cell points will be extracted. </param>
 	/// <param name='outDataCellArray'> Stores all the extracted data-cell points. </param>
 	/// <param name='matrixSize'> The interpreted matrix size of the square contour. </param>
-	void extractDataCellPoints(std::vector<cv::Point*>* squareContour, OUT std::vector<cv::Point*>* outDataCellArray, int matrixSize);
+	void extractDataCellPoints(std::vector<cv::Point*>& squareContour, OUT std::vector<cv::Point*>& outDataCellArray, int matrixSize);
 
 	/// <summary>
 	/// Decodes the marker, returning its ID.
@@ -74,5 +74,5 @@ namespace orga {
 	/// <param name='image'> The image containing the marker. </param>
 	/// <param name='dataCellCoords'> The data cell coordinates of the marker. </param>
 	/// <returns> Returns the ID of the marker. Returns -1 if the marker is undecodable. </returns>
-	int identifyMarkerID(cv::Mat* image, std::vector<cv::Point*>* dataCellCoords);
+	int identifyMarkerID(cv::Mat* image, std::vector<cv::Point*> dataCellCoords);
 }

@@ -156,12 +156,14 @@
     <ClCompile Include="huetagreader.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="markerholder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h" />
     <ClInclude Include="crc.h" />
     <ClInclude Include="huetagreader.h" />
     <ClInclude Include="line.h" />
+    <ClInclude Include="markerholder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

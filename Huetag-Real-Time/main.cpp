@@ -51,7 +51,7 @@ int main() {
 		// Find square contours
 		std::vector<std::vector<cv::Point>> contours;
 		cv::findContours(binary, OUT contours, CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
-		std::vector<std::vector<cv::Point*>*> squareContours;
+		std::vector<std::vector<cv::Point*>> squareContours;
 		int max = contours.size();
 		for (int i = 0; i < max; i++) {
 			std::vector<cv::Point> approxSquare;
@@ -67,11 +67,11 @@ int main() {
 				cv::line(main, P3, P4, cv::Scalar(255, 0, 0), 5);
 				cv::line(main, P4, P1, cv::Scalar(255, 0, 0), 5);
 
-				std::vector<cv::Point*>* temp = new std::vector<cv::Point*>();
-				temp->push_back(new cv::Point(P1));
-				temp->push_back(new cv::Point(P2));
-				temp->push_back(new cv::Point(P3));
-				temp->push_back(new cv::Point(P4));
+				std::vector<cv::Point*> temp;
+				temp.push_back(new cv::Point(P1));
+				temp.push_back(new cv::Point(P2));
+				temp.push_back(new cv::Point(P3));
+				temp.push_back(new cv::Point(P4));
 				squareContours.push_back(temp);
 			}
 		}
@@ -80,21 +80,17 @@ int main() {
 		// Transform squareContours to their data cell coordinates
 		max = squareContours.size();
 		for (int i = 0; i < max; i++) {
-			std::vector<cv::Point*>* squareContour = squareContours.at(i);
+			std::vector<cv::Point*>* squareContour = &squareContours.at(i);
 			
-			std::vector<cv::Point*>* dataCellPoints = new std::vector<cv::Point*>();
-
-			orga::extractDataCellPoints(squareContour, OUT dataCellPoints, 6);
-
-			for (int j = 0; j < dataCellPoints->size(); j++) {
+			std::vector<cv::Point*> dataCellPoints;
+			orga::extractDataCellPoints(*squareContour, OUT dataCellPoints, 6);
+			for (int j = 0; j < dataCellPoints.size(); j++) {
 				if (j == 0) 
-					cv::circle(main, *dataCellPoints->at(j), 2, cv::Scalar(255, 0, 0), 2);
+					cv::circle(main, *dataCellPoints.at(j), 2, cv::Scalar(255, 0, 0), 2);
 				else if (j == 1) 
-					cv::circle(main, *dataCellPoints->at(j), 2, cv::Scalar(255, 0, 255), 2);
+					cv::circle(main, *dataCellPoints.at(j), 2, cv::Scalar(255, 0, 255), 2);
 				else 
-					cv::circle(main, *dataCellPoints->at(j), 1, cv::Scalar(255, 255, 255), 1);
-
-				
+					cv::circle(main, *dataCellPoints.at(j), 1, cv::Scalar(255, 255, 255), 1);
 			}
 
 			int id = orga::identifyMarkerID(&blur, dataCellPoints);
@@ -121,14 +117,14 @@ int main() {
 				setLabel(image_temp, cv::String(std::to_string(id)), intersect);*/
 			}
 
-			dataCellPoints->clear();
-			delete dataCellPoints;
+			dataCellPoints.clear();
+			std::vector<cv::Point*>().swap(dataCellPoints);
 		}
 
 		cv::imshow("main", main);
 
 		squareContours.clear();
-		std::vector<std::vector<cv::Point*>*>().swap(squareContours);
+		std::vector<std::vector<cv::Point*>>().swap(squareContours);
 
 		cv::waitKey(30);
 	}

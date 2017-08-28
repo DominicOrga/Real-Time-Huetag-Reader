@@ -6,7 +6,6 @@
 #include "crc.h"
 
 #include "opencv2/highgui.hpp"
-#include "opencv2/opencv.hpp"
 #include <iostream>
 
 namespace orga
@@ -171,14 +170,14 @@ namespace orga
 			}
 		}
 
-		void extractDataCellLabColors(cv::Mat* image, std::vector<cv::Point*>* dataCellCoords, OUT std::vector<orga::Lab>& outLabArray) {
+		void extractDataCellLabColors(cv::Mat* image, std::vector<cv::Point*> dataCellCoords, OUT std::vector<orga::Lab>& outLabArray) {
 			outLabArray.clear();
 
 			// Iterate through all the quinaryData cell coordinates.
-			int iMax = dataCellCoords->size();
+			int iMax = dataCellCoords.size();
 			for (int i = 0; i < iMax; i++)
 			{
-				cv::Point p = *dataCellCoords->at(i);
+				cv::Point p = *dataCellCoords.at(i);
 
 				// Extract rgb.
 				cv::Vec3b color = image->at<cv::Vec3b>(p.y < 0 ? 0 : p.y, p.x < 0 ? 0 : p.x);
@@ -245,11 +244,11 @@ namespace orga
 		}
 	}
 
-	void extractDataCellPoints(std::vector<cv::Point*>* squareContour, OUT std::vector<cv::Point*>* outDataCellArray, int matrixSize) {
-		cv::Point* p0 = squareContour->at(0);
-		cv::Point* p1 = squareContour->at(1);
-		cv::Point* p2 = squareContour->at(2);
-		cv::Point* p3 = squareContour->at(3);
+	void extractDataCellPoints(std::vector<cv::Point*>& squareContour, OUT std::vector<cv::Point*>& outDataCellArray, int matrixSize) {
+		cv::Point* p0 = squareContour.at(0);
+		cv::Point* p1 = squareContour.at(1);
+		cv::Point* p2 = squareContour.at(2);
+		cv::Point* p3 = squareContour.at(3);
 
 		Line line1;
 		Line line2;
@@ -289,12 +288,12 @@ namespace orga
 
 				cv::Point intersect = getIntersection(line5, line6);
 
-				outDataCellArray->push_back(new cv::Point(intersect));
+				outDataCellArray.push_back(new cv::Point(intersect));
 			}
 		}
 	}
 
-	int identifyMarkerID(cv::Mat* image, std::vector<cv::Point*>* dataCellCoords)
+	int identifyMarkerID(cv::Mat* image, std::vector<cv::Point*> dataCellCoords)
 	{
 		// Get Lab value from the data cell coordinates placed within the image.
 		std::vector<orga::Lab> labArray;
