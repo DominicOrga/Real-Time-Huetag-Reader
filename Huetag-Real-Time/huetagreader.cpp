@@ -184,7 +184,7 @@ namespace orga
 				cv::Vec3b color = image->at<cv::Vec3b>(p.y < 0 ? 0 : p.y, p.x < 0 ? 0 : p.x);
 
 				// Convert rgb to Lab.
-				orga::RGB rgb{ (float)color[0], (float)color[1], (float)color[2] };
+				orga::RGB rgb{ (float) color[2], (float) color[1], (float) color[0] };
 				orga::Lab lab = orga::RGBToLab(rgb);
 
 				outLabArray.push_back(lab);
