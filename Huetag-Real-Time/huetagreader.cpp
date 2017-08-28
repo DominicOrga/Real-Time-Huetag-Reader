@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include <iostream>
 
 #include "huetagreader.h"
 #include "color.h"
@@ -7,6 +6,8 @@
 #include "crc.h"
 
 #include "opencv2/highgui.hpp"
+#include "opencv2/opencv.hpp"
+#include <iostream>
 
 namespace orga
 {
@@ -17,6 +18,8 @@ namespace orga
 			int col;
 
 			int rotation = identifyMarkerRotation(dataCellLabArray);
+
+			std::cout << rotation << std::endl;
 
 			orga::Lab redLabRef;
 			orga::Lab greenLabRef;
@@ -168,23 +171,23 @@ namespace orga
 			}
 		}
 
-		void extractDataCellLabColors(cv::Mat& image, std::vector<cv::Point>& dataCellCoords, OUT std::vector<orga::Lab>& outLabArray) {
+		void extractDataCellLabColors(cv::Mat* image, std::vector<cv::Point*>* dataCellCoords, OUT std::vector<orga::Lab>& outLabArray) {
 			outLabArray.clear();
 
 			// Iterate through all the quinaryData cell coordinates.
-			int iMax = dataCellCoords.size();
+			int iMax = dataCellCoords->size();
 			for (int i = 0; i < iMax; i++)
 			{
-				cv::Point p = dataCellCoords.at(i);
+				cv::Point p = *dataCellCoords->at(i);
 
 				// Extract rgb.
-				cv::Vec3b color = image.at<cv::Vec3b>(p.y < 0 ? 0 : p.y, p.x < 0 ? 0 : p.x);
+				cv::Vec3b color = image->at<cv::Vec3b>(p.y < 0 ? 0 : p.y, p.x < 0 ? 0 : p.x);
 
 				// Convert rgb to Lab.
 				orga::RGB rgb{ (float)color[0], (float)color[1], (float)color[2] };
 				orga::Lab lab = orga::RGBToLab(rgb);
 
-				outLabArray.push_back(lab);				
+				outLabArray.push_back(lab);
 			}
 		}
 
@@ -194,6 +197,7 @@ namespace orga
 			float gd = eucledianDistance(lab, greenLabRef);
 			float yd = eucledianDistance(lab, yellowLabRef);
 			float bd = eucledianDistance(lab, blueLabRef);
+
 
 			if (gd <= rd && gd <= yd && gd <= bd) {
 				return 1;
@@ -232,6 +236,7 @@ namespace orga
 
 		float eucledianDistance(orga::Lab& lab1, orga::Lab& lab2) {
 			return sqrt(pow(lab2.a - lab1.a, 2) + pow(lab2.b - lab1.b, 2));
+			//return (fabs(lab2.a - lab1.a) + fabs(lab2.b - lab1.b));
 		}
 
 		void deconvolveStaticBits(std::vector<char>& oldData, OUT std::vector<char>& newData) {
@@ -240,11 +245,11 @@ namespace orga
 		}
 	}
 
-	void extractDataCellPoints(std::vector<cv::Point>& squareContour, OUT std::vector<cv::Point>& outDataCellArray, int matrixSize) {
-		cv::Point* p0 = &squareContour.at(0);
-		cv::Point* p1 = &squareContour.at(1);
-		cv::Point* p2 = &squareContour.at(2);
-		cv::Point* p3 = &squareContour.at(3);
+	void extractDataCellPoints(std::vector<cv::Point*>* squareContour, OUT std::vector<cv::Point*>* outDataCellArray, int matrixSize) {
+		cv::Point* p0 = squareContour->at(0);
+		cv::Point* p1 = squareContour->at(1);
+		cv::Point* p2 = squareContour->at(2);
+		cv::Point* p3 = squareContour->at(3);
 
 		Line line1;
 		Line line2;
@@ -284,12 +289,12 @@ namespace orga
 
 				cv::Point intersect = getIntersection(line5, line6);
 
-				outDataCellArray.push_back(intersect);
+				outDataCellArray->push_back(new cv::Point(intersect));
 			}
 		}
 	}
 
-	int identifyMarkerID(cv::Mat& image, std::vector<cv::Point>& dataCellCoords)
+	int identifyMarkerID(cv::Mat* image, std::vector<cv::Point*>* dataCellCoords)
 	{
 		// Get Lab value from the data cell coordinates placed within the image.
 		std::vector<orga::Lab> labArray;
@@ -299,11 +304,10 @@ namespace orga
 		std::vector<char> bitData;
 		detail::extractMarkerData(labArray, OUT bitData);
 
-		for (int i = 0; i < bitData.size() - 1; i+=2) {
-			std::cout << (int) bitData.at(i) << std::flush;
-			std::cout << (int )bitData.at(i + 1) << " " << std::flush;
-
+		for (int i = 0; i < bitData.size(); i += 2) {
+			std::cout << (int) bitData.at(i) << (int) bitData.at(i + 1) << " " << std::flush;
 		}
+
 		std::cout << std::endl;
 
 		std::vector<char> bitData2;
@@ -314,19 +318,23 @@ namespace orga
 			int b = bitData2.at(i + 1);
 		}
 
+
 		std::vector<char> mainBits;
 		int result = orga::CRCDeconvolution(orga::generatorKey, bitData2, OUT mainBits);
 
 		// If CRC pass, then return decoded marker id from the binary bits.
 		if (result == 0) {
+
 			unsigned long long int decimal = 0;
 			for (int i = mainBits.size() - 1; i >= 0; i--) {
 				decimal += mainBits.at(i) * powf(2, mainBits.size() - 1 - i);
 			}
 
+
 			return decimal;
 		}
 		else {
+
 			return -1;
 		}
 	}
