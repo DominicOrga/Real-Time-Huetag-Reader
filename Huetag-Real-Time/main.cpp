@@ -84,7 +84,9 @@ int main() {
 			
 			std::vector<cv::Point*> dataCellPoints;
 			orga::extractDataCellPoints(*squareContour, OUT dataCellPoints, 6);
-			for (int j = 0; j < dataCellPoints.size(); j++) {
+			int max1 = dataCellPoints.size();
+			for (int j = 0; j < max1; j++) {
+
 				if (j == 0) 
 					cv::circle(main, *dataCellPoints.at(j), 2, cv::Scalar(255, 0, 0), 2);
 				else if (j == 1) 
@@ -117,12 +119,21 @@ int main() {
 				setLabel(image_temp, cv::String(std::to_string(id)), intersect);*/
 			}
 
+			for (int j = 0; j < max1; j++)
+				delete dataCellPoints.at(j);
+
 			dataCellPoints.clear();
 			std::vector<cv::Point*>().swap(dataCellPoints);
 		}
 
 		cv::imshow("main", main);
 
+		for (int i = 0; i < max; i++) {
+			std::vector<cv::Point*>* temp = &squareContours.at(i);
+			int max2 = temp->size();
+			for (int j = 0; j < max2; j++)
+				delete temp->at(j);
+		}	
 		squareContours.clear();
 		std::vector<std::vector<cv::Point*>>().swap(squareContours);
 

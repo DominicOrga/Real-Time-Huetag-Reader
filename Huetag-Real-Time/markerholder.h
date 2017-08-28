@@ -4,7 +4,7 @@
 
 namespace orga {
 	struct markerholder {
-		std::vector<cv::Point*>* _contour;
+		std::vector<cv::Point*> _contour;
 		int _id;
 		int _perimeter;
 
