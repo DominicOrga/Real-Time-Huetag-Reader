@@ -18,8 +18,6 @@ namespace orga
 
 			int rotation = identifyMarkerRotation(dataCellLabArray);
 
-			std::cout << rotation << std::endl;
-
 			orga::Lab redLabRef;
 			orga::Lab greenLabRef;
 			orga::Lab yellowLabRef;
