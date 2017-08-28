@@ -17,7 +17,7 @@ const int _cSliderMax = 100;
 int _contourMinArea = 5000;
 int _contourMaxArea = 125000;
 
-int _trackMinDistDiff = 50;
+int _trackMinDistDiff = 25;
 int _trackMinSizeDiff = 1000;
 
 void onBlockSizeTrackbar(int, void*) {
@@ -29,10 +29,7 @@ void onBlockSizeTrackbar(int, void*) {
 	_blockSizeSlider = (_blockSizeSlider % 2 == 0) ? _blockSizeSlider + 1 : _blockSizeSlider;
 }
 
-
-
 int main() {
-
 	cv::VideoCapture cam(0);
 
 	if (!cam.isOpened())
@@ -44,9 +41,10 @@ int main() {
 	cv::Mat smoothKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
 	cv::Mat grayscale, binary;
 	
-	cv::namedWindow("main", CV_WINDOW_FULLSCREEN);
+	cv::namedWindow("main", CV_WINDOW_NORMAL);
+
 	cv::Mat blur, main;
-	std::vector<orga::markerholder> markerHolders;
+	std::vector<orga::markerholder> cachedContours;
 
 	cv::Mat frame;
 	while (1) {
@@ -96,9 +94,9 @@ int main() {
 		max = squareContours.size();
 		for (int i = 0; i < max; i++) {
 			std::vector<cv::Point*>* squareContour = &squareContours.at(i);
-			
+
 			// Track square contour
-			if (!markerHolders.empty()) {
+			if (!cachedContours.empty()) {
 				cv::Point* P1 = squareContour->at(0);
 				cv::Point* P2 = squareContour->at(1);
 				cv::Point* P3 = squareContour->at(2);
@@ -114,20 +112,23 @@ int main() {
 				orga::markerholder* nearestCachedContour = NULL;
 				float d = 1000000;
 				int index = -1;
-				for (int j = 0; j < markerHolders.size(); j++) {
-					orga::markerholder& temp = markerHolders.at(j);
+				// Try to find a near cached contour
+				for (int j = 0; j < cachedContours.size(); j++) {
+					orga::markerholder& temp = cachedContours.at(j);
 
-					PP1 = squareContour->at(0);
-					PP2 = squareContour->at(1);
-					PP3 = squareContour->at(2);
-					PP4 = squareContour->at(3);
+					PP1 = &temp._contour.at(0);
+					PP2 = &temp._contour.at(1);
+					PP3 = &temp._contour.at(2);
+					PP4 = &temp._contour.at(3);
 
 					cv::Point center1 = orga::getIntersection(orga::Line(PP1, PP3), orga::Line(PP2, PP4));
 
 					float d1 = sqrtf(powf(center.x - center1.x, 2) + powf(center.y - center1.y, 2));
 
+					//std::cout << d1 << " (" << center.x << "," << center.y << ") & (" << center1.x << "," << center1.y << ") " << std::flush;
+
 					if (d1 < _trackMinDistDiff && d1 < d) {
-						nearestCachedContour = &markerHolders.at(j);
+						nearestCachedContour = &cachedContours.at(j);
 						d = d1;
 						index = j;
 					}
@@ -163,11 +164,10 @@ int main() {
 				cv::rectangle(main, center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
 				cv::putText(main, std::to_string(nearestCachedContour->_id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
 
-				markerHolders.erase(markerHolders.begin() + index);
 				orga::markerholder mh(*squareContour, nearestCachedContour->_id);
 				markerHoldersTemp.push_back(mh);
 
-				std::cout << "Tracked" << std::endl;
+				std::cout << "Marker " << i << ": Tracked" << std::endl;
 				continue;
 			}
 
@@ -196,7 +196,7 @@ int main() {
 				orga::markerholder mh(*squareContour, id);
 				markerHoldersTemp.push_back(mh);
 
-				std::cout << "identified" << std::endl;
+				std::cout << "Marker " << i << "identified" << std::endl;
 			}
 
 			for (int j = 0; j < max1; j++)
@@ -206,7 +206,7 @@ int main() {
 			std::vector<cv::Point*>().swap(dataCellPoints);
 		}
 
-		markerHolders.swap(markerHoldersTemp);
+		cachedContours.swap(markerHoldersTemp);
 
 		cv::imshow("main", main);
 
@@ -219,6 +219,7 @@ int main() {
 		squareContours.clear();
 		std::vector<std::vector<cv::Point*>>().swap(squareContours);
 
+		std::cout << std::endl;
 		cv::waitKey(30);
 	}
 

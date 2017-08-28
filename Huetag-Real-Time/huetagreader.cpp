@@ -301,12 +301,6 @@ namespace orga
 		std::vector<char> bitData;
 		detail::extractMarkerData(labArray, OUT bitData);
 
-		for (int i = 0; i < bitData.size(); i += 2) {
-			std::cout << (int) bitData.at(i) << (int) bitData.at(i + 1) << " " << std::flush;
-		}
-
-		std::cout << std::endl;
-
 		std::vector<char> bitData2;
 		detail::deconvolveStaticBits(bitData, OUT  bitData2);
 
