@@ -260,16 +260,16 @@ namespace orga
 		if (A == -1 || A == 3 ||
 			(A == -2 && (B == 2 || B == 3)) ||
 			(A == 2 && (B == 1 || B == 4))) {
-			line1.setPoints(p0, p1);
-			line2.setPoints(p1, p2);
-			line3.setPoints(p2, p3);
-			line4.setPoints(p3, p0);
-		}
-		else {
 			line1.setPoints(p0, p3);
 			line2.setPoints(p3, p2);
 			line3.setPoints(p2, p1);
 			line4.setPoints(p1, p0);
+		}
+		else {
+			line1.setPoints(p0, p1);
+			line2.setPoints(p1, p2);
+			line3.setPoints(p2, p3);
+			line4.setPoints(p3, p0);
 		}
 
 		for (int i = 0; i < matrixSize; i++)
@@ -304,14 +304,14 @@ namespace orga
 		std::vector<char> bitData2;
 		detail::deconvolveStaticBits(bitData, OUT  bitData2);
 
-		for (int i = 0; i < bitData2.size() - 1; i += 2) {
-			int a = bitData2.at(i);
-			int b = bitData2.at(i + 1);
+		for (int i = 0; i < bitData.size() - 1; i += 2) {
+			int a = bitData.at(i);
+			int b = bitData.at(i + 1);
 		}
-
 
 		std::vector<char> mainBits;
 		int result = orga::CRCDeconvolution(orga::generatorKey, bitData2, OUT mainBits);
+
 
 		// If CRC pass, then return decoded marker id from the binary bits.
 		if (result == 0) {

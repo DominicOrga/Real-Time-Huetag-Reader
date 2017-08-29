@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <conio.h>	
 #include "huetagreader.h"
 #include "markerholder.h"
 #include "line.h"
@@ -11,13 +12,15 @@
 
 int _blockSizeSlider = 255;
 const int _blockSizeSliderMax = 255;
-int _cSlider = 1;
+int _cSlider = 10;
 const int _cSliderMax = 100;
 
 int _contourMinArea = 5000;
 int _contourMaxArea = 125000;
 
-int _trackMinDistDiff = 25;
+int _trackMinDistDiff = 50;
+
+int showImage = 0;
 
 void onBlockSizeTrackbar(int, void*) {
 	if (_blockSizeSlider < 2) {
@@ -28,7 +31,41 @@ void onBlockSizeTrackbar(int, void*) {
 	_blockSizeSlider = (_blockSizeSlider % 2 == 0) ? _blockSizeSlider + 1 : _blockSizeSlider;
 }
 
+void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat &output, cv::Point2i location) {
+	background.copyTo(output);
+
+	for (int y = std::max(location.y, 0); y < background.rows; ++y) {
+		int fY = y - location.y; 
+
+		if (fY >= foreground.rows)
+			break;
+
+		for (int x = std::max(location.x, 0); x < background.cols; ++x) {
+			int fX = x - location.x; 
+
+			if (fX >= foreground.cols)
+				break;
+
+			double opacity = ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3]) / 255.;
+
+			for (int c = 0; opacity > 0 && c < output.channels(); ++c) {
+				unsigned char foregroundPx = foreground.data[fY * foreground.step + fX * foreground.channels() + c];
+				unsigned char backgroundPx = background.data[y * background.step + x * background.channels() + c];
+				output.data[y*output.step + output.channels()*x + c] = backgroundPx * (1. - opacity) + foregroundPx * opacity;
+			}
+		}
+	}
+}
+
+
 int main() {
+
+	std::map<int, cv::Mat> images;
+	images[14] = cv::imread("c:\\Users\\domini\\Desktop\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED);
+	images[1014] = cv::imread("c:\\Users\\domini\\Desktop\\mirana.png", CV_LOAD_IMAGE_UNCHANGED);
+	images[10014] = cv::imread("c:\\Users\\domini\\Desktop\\traxex.png", CV_LOAD_IMAGE_UNCHANGED);
+	images[1000014] = cv::imread("c:\\Users\\domini\\Desktop\\magina.png", CV_LOAD_IMAGE_UNCHANGED);
+
 	cv::VideoCapture cam(0);
 
 	if (!cam.isOpened())
@@ -41,13 +78,19 @@ int main() {
 	cv::Mat grayscale, binary;
 	
 	cv::namedWindow("main", CV_WINDOW_NORMAL);
+	cv::createTrackbar("Show Image", "main", &showImage, 1, 0);
 
 	cv::Mat blur, main;
 	std::vector<orga::markerholder> cachedMarkers;
 
 	cv::Mat frame;
 	while (1) {
+		if (_kbhit() && _getch() == 's') {
+			showImage = !showImage;
+		}
+
 		cam >> frame;
+		cv::flip(frame, OUT frame, 1);
 
 		cv::cvtColor(frame, OUT grayscale, CV_BGR2GRAY);
 		cv::adaptiveThreshold(grayscale, OUT binary, 255, CV_ADAPTIVE_THRESH_MEAN_C, CV_THRESH_BINARY, _blockSizeSlider, _cSlider);
@@ -131,9 +174,7 @@ int main() {
 					goto identify_marker;
 				}
 
-				orga::markerholder mh(*squareContour, nearestCachedContour->_id);
-				identifiedMarkers.push_back(mh);
-
+				identifiedMarkers.push_back(orga::markerholder(*squareContour, nearestCachedContour->_id));
 				std::cout << "Marker " << i << ": Tracked" << std::endl;
 				continue;
 			}
@@ -142,17 +183,15 @@ int main() {
 			
 			std::vector<cv::Point*> dataCellPoints;
 			orga::extractDataCellPoints(*squareContour, OUT dataCellPoints, 6);
-			int max1 = dataCellPoints.size();
-
+			
 			int id = orga::identifyMarkerID(&blur, dataCellPoints);
 
 			if (id != -1) {				
-				orga::markerholder mh(*squareContour, id);
-				identifiedMarkers.push_back(mh);
-
+				identifiedMarkers.push_back(orga::markerholder(*squareContour, id));
 				std::cout << "Marker " << i << "identified" << std::endl;
 			}
 
+			int max1 = dataCellPoints.size();
 			for (int j = 0; j < max1; j++)
 				delete dataCellPoints.at(j);
 
@@ -182,9 +221,24 @@ int main() {
 			cv::Point& P3 = contour->at(2);
 			cv::Point& P4 = contour->at(3);
 			cv::Point center = orga::getIntersection(orga::Line(&P1, &P3), orga::Line(&P2, &P4));
-			cv::Size text = cv::getTextSize(std::to_string(id), cv::FONT_HERSHEY_SIMPLEX, 0.75, 1, 0);
-			cv::rectangle(main, center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
-			cv::putText(main, std::to_string(id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
+
+			if (showImage) {
+				cv::Mat image = images[id];
+				if (image.data) {
+					int w = image.size().width;
+					int h = image.size().height;
+
+					cv::resize(image, image, cv::Size(w * 0.3, h * 0.3));
+
+					cv::Point imageCenter = cv::Point(center.x - w * 0.3 / 2, center.y - h * 0.3 / 2);
+					overlayImage(main, image, main, imageCenter);
+				}
+			}
+			else {
+				cv::Size text = cv::getTextSize(std::to_string(id), cv::FONT_HERSHEY_SIMPLEX, 0.75, 1, 0);
+				cv::rectangle(main, center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
+				cv::putText(main, std::to_string(id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
+			}
 		}
 
 		cv::imshow("main", main);
@@ -200,7 +254,7 @@ int main() {
 		squareContours.clear();
 		std::vector<std::vector<cv::Point*>>().swap(squareContours);
 
-		std::cout << std::endl;
+		//std::cout << std::endl;
 		cv::waitKey(30);
 	}
 
