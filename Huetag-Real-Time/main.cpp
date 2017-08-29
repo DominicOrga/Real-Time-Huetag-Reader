@@ -20,7 +20,9 @@ int _contourMaxArea = 125000;
 
 int _trackMinDistDiff = 50;
 
-int showImage = 0;
+int _showImage = 0;
+
+std::map<int, cv::Mat> _images;
 
 void onBlockSizeTrackbar(int, void*) {
 	if (_blockSizeSlider < 2) {
@@ -57,28 +59,29 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 	}
 }
 
+void assignMarkers() {
+	_images[14] = cv::imread("c:\\Huetag\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED);
+	_images[1014] = cv::imread("c:\\Huetag\\mirana.png", CV_LOAD_IMAGE_UNCHANGED);
+	_images[10014] = cv::imread("c:\\Huetag\\traxex.png", CV_LOAD_IMAGE_UNCHANGED);
+	_images[1000014] = cv::imread("c:\\Huetag\\magina.png", CV_LOAD_IMAGE_UNCHANGED);
+}
 
 int main() {
-
-	std::map<int, cv::Mat> images;
-	images[14] = cv::imread("c:\\Users\\domini\\Desktop\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED);
-	images[1014] = cv::imread("c:\\Users\\domini\\Desktop\\mirana.png", CV_LOAD_IMAGE_UNCHANGED);
-	images[10014] = cv::imread("c:\\Users\\domini\\Desktop\\traxex.png", CV_LOAD_IMAGE_UNCHANGED);
-	images[1000014] = cv::imread("c:\\Users\\domini\\Desktop\\magina.png", CV_LOAD_IMAGE_UNCHANGED);
+	assignMarkers();
 
 	cv::VideoCapture cam(0);
 
 	if (!cam.isOpened())
 		return -1;
 
-	cv::namedWindow("binary", CV_WINDOW_NORMAL);
+	cv::namedWindow("binary", CV_WINDOW_AUTOSIZE);
 	cv::createTrackbar("Block Size", "binary", &_blockSizeSlider, _blockSizeSliderMax, onBlockSizeTrackbar);
 	cv::createTrackbar("C Size", "binary", &_cSlider, _cSliderMax, 0);
 	cv::Mat smoothKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
 	cv::Mat grayscale, binary;
 	
 	cv::namedWindow("main", CV_WINDOW_NORMAL);
-	cv::createTrackbar("Show Image", "main", &showImage, 1, 0);
+	cv::createTrackbar("Show Image", "main", &_showImage, 1, 0);
 
 	cv::Mat blur, main;
 	std::vector<orga::markerholder> cachedMarkers;
@@ -86,7 +89,7 @@ int main() {
 	cv::Mat frame;
 	while (1) {
 		if (_kbhit() && _getch() == 's') {
-			showImage = !showImage;
+			_showImage = !_showImage;
 		}
 
 		cam >> frame;
@@ -222,22 +225,28 @@ int main() {
 			cv::Point& P4 = contour->at(3);
 			cv::Point center = orga::getIntersection(orga::Line(&P1, &P3), orga::Line(&P2, &P4));
 
-			if (showImage) {
-				cv::Mat image = images[id];
+			if (_showImage) {
+				cv::Mat image = _images[id];
 				if (image.data) {
 					int w = image.size().width;
 					int h = image.size().height;
 
-					cv::resize(image, image, cv::Size(w * 0.3, h * 0.3));
+					std::vector<cv::Point> contour {P1, P2, P3, P4};
 
-					cv::Point imageCenter = cv::Point(center.x - w * 0.3 / 2, center.y - h * 0.3 / 2);
+					float area = cv::contourArea(contour);
+
+					cv::resize(image, image, cv::Size(w * 0.3 * area / 12500, h * 0.3 * area / 12500));
+					w = image.size().width;
+					h = image.size().height;
+
+					cv::Point imageCenter = cv::Point(center.x - w / 2, center.y - h / 2);
 					overlayImage(main, image, main, imageCenter);
 				}
 			}
 			else {
 				cv::Size text = cv::getTextSize(std::to_string(id), cv::FONT_HERSHEY_SIMPLEX, 0.75, 1, 0);
-				cv::rectangle(main, center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
-				cv::putText(main, std::to_string(id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
+				cv::rectangle(main, center - cv::Point(text.width/2, -5), center + cv::Point(text.width / 2, -text.height - 5), CV_RGB(0, 0, 0), CV_FILLED);
+				cv::putText(main, std::to_string(id), center - cv::Point(text.width / 2, 0), cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
 			}
 		}
 
