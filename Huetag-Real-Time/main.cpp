@@ -11,14 +11,13 @@
 
 int _blockSizeSlider = 255;
 const int _blockSizeSliderMax = 255;
-int _cSlider = 10;
+int _cSlider = 1;
 const int _cSliderMax = 100;
 
 int _contourMinArea = 5000;
 int _contourMaxArea = 125000;
 
 int _trackMinDistDiff = 25;
-int _trackMinSizeDiff = 1000;
 
 void onBlockSizeTrackbar(int, void*) {
 	if (_blockSizeSlider < 2) {
@@ -44,7 +43,7 @@ int main() {
 	cv::namedWindow("main", CV_WINDOW_NORMAL);
 
 	cv::Mat blur, main;
-	std::vector<orga::markerholder> cachedContours;
+	std::vector<orga::markerholder> cachedMarkers;
 
 	cv::Mat frame;
 	while (1) {
@@ -89,23 +88,18 @@ int main() {
 		}
 
 		cv::blur(main, OUT blur, cv::Size(3, 3));
-		std::vector<orga::markerholder> markerHoldersTemp;
+		std::vector<orga::markerholder> identifiedMarkers;
 		// Transform squareContours to their data cell coordinates
 		max = squareContours.size();
 		for (int i = 0; i < max; i++) {
 			std::vector<cv::Point*>* squareContour = &squareContours.at(i);
 
 			// Track square contour
-			if (!cachedContours.empty()) {
+			if (!cachedMarkers.empty()) {
 				cv::Point* P1 = squareContour->at(0);
 				cv::Point* P2 = squareContour->at(1);
 				cv::Point* P3 = squareContour->at(2);
 				cv::Point* P4 = squareContour->at(3);
-
-				cv::Point* PP1 = NULL;
-				cv::Point* PP2 = NULL;
-				cv::Point* PP3 = NULL;
-				cv::Point* PP4 = NULL;
 
 				cv::Point center = orga::getIntersection(orga::Line(P1, P3), orga::Line(P2, P4));
 
@@ -113,22 +107,20 @@ int main() {
 				float d = 1000000;
 				int index = -1;
 				// Try to find a near cached contour
-				for (int j = 0; j < cachedContours.size(); j++) {
-					orga::markerholder& temp = cachedContours.at(j);
+				for (int j = 0; j < cachedMarkers.size(); j++) {
+					orga::markerholder& temp = cachedMarkers.at(j);
 
-					PP1 = &temp._contour.at(0);
-					PP2 = &temp._contour.at(1);
-					PP3 = &temp._contour.at(2);
-					PP4 = &temp._contour.at(3);
+					cv::Point* PP1 = &temp._contour.at(0);
+					cv::Point* PP2 = &temp._contour.at(1);
+					cv::Point* PP3 = &temp._contour.at(2);
+					cv::Point* PP4 = &temp._contour.at(3);
 
 					cv::Point center1 = orga::getIntersection(orga::Line(PP1, PP3), orga::Line(PP2, PP4));
 
 					float d1 = sqrtf(powf(center.x - center1.x, 2) + powf(center.y - center1.y, 2));
 
-					//std::cout << d1 << " (" << center.x << "," << center.y << ") & (" << center1.x << "," << center1.y << ") " << std::flush;
-
 					if (d1 < _trackMinDistDiff && d1 < d) {
-						nearestCachedContour = &cachedContours.at(j);
+						nearestCachedContour = &cachedMarkers.at(j);
 						d = d1;
 						index = j;
 					}
@@ -139,33 +131,8 @@ int main() {
 					goto identify_marker;
 				}
 
-				float perim = 
-					sqrtf(powf(P1->x - P2->x, 2) + powf(P1->y- P2->y, 2)) +
-					sqrtf(powf(P2->x - P3->x, 2) + powf(P2->y - P3->y, 2)) +
-					sqrtf(powf(P3->x - P4->x, 2) + powf(P3->y - P4->y, 2)) +
-					sqrtf(powf(P4->x - P1->x, 2) + powf(P4->y - P1->y, 2));
-
-				float perim1 =
-					sqrtf(powf(PP1->x - P2->x, 2) + powf(PP1->y - PP2->y, 2)) +
-					sqrtf(powf(PP2->x - P3->x, 2) + powf(PP2->y - PP3->y, 2)) +
-					sqrtf(powf(PP3->x - P4->x, 2) + powf(PP3->y - PP4->y, 2)) +
-					sqrtf(powf(PP4->x - P1->x, 2) + powf(PP4->y - PP1->y, 2));
-
-				// Test if perimeter difference passed threshold
-				if (fabs(perim - perim1) > _trackMinSizeDiff) {
-					goto identify_marker;
-				}
-
-				cv::line(main, *P1, *P2, cv::Scalar(0, 255, 0), 5);
-				cv::line(main, *P2, *P3, cv::Scalar(0, 255, 0), 5);
-				cv::line(main, *P3, *P4, cv::Scalar(0, 255, 0), 5);
-				cv::line(main, *P4, *P1, cv::Scalar(0, 255, 0), 5);
-				cv::Size text = cv::getTextSize(std::to_string(nearestCachedContour->_id), cv::FONT_HERSHEY_SIMPLEX, 0.75, 1, 0);
-				cv::rectangle(main, center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
-				cv::putText(main, std::to_string(nearestCachedContour->_id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
-
 				orga::markerholder mh(*squareContour, nearestCachedContour->_id);
-				markerHoldersTemp.push_back(mh);
+				identifiedMarkers.push_back(mh);
 
 				std::cout << "Marker " << i << ": Tracked" << std::endl;
 				continue;
@@ -179,22 +146,9 @@ int main() {
 
 			int id = orga::identifyMarkerID(&blur, dataCellPoints);
 
-			if (id != -1) {
-				cv::Point& P1 = *squareContour->at(0);
-				cv::Point& P2 = *squareContour->at(1);
-				cv::Point& P3 = *squareContour->at(2);
-				cv::Point& P4 = *squareContour->at(3);
-				cv::line(main, P1, P2, cv::Scalar(0, 255, 0), 5);
-				cv::line(main, P2, P3, cv::Scalar(0, 255, 0), 5);
-				cv::line(main, P3, P4, cv::Scalar(0, 255, 0), 5);
-				cv::line(main, P4, P1, cv::Scalar(0, 255, 0), 5);
-				cv::Point center = orga::getIntersection(orga::Line(&P1, &P3), orga::Line(&P2, &P4));
-				cv::Size text = cv::getTextSize(std::to_string(id), cv::FONT_HERSHEY_SIMPLEX, 0.75, 1, 0);
-				cv::rectangle(main,  center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
-				cv::putText(main, std::to_string(id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
-				
+			if (id != -1) {				
 				orga::markerholder mh(*squareContour, id);
-				markerHoldersTemp.push_back(mh);
+				identifiedMarkers.push_back(mh);
 
 				std::cout << "Marker " << i << "identified" << std::endl;
 			}
@@ -206,9 +160,36 @@ int main() {
 			std::vector<cv::Point*>().swap(dataCellPoints);
 		}
 
-		cachedContours.swap(markerHoldersTemp);
+		for (int i = 0; i < identifiedMarkers.size(); i++) {
+			std::vector<cv::Point>* contour = &identifiedMarkers.at(i)._contour;
+
+			cv::Point& P1 = contour->at(0);
+			cv::Point& P2 = contour->at(1);
+			cv::Point& P3 = contour->at(2);
+			cv::Point& P4 = contour->at(3);
+			cv::line(main, P1, P2, cv::Scalar(0, 255, 0), 5);
+			cv::line(main, P2, P3, cv::Scalar(0, 255, 0), 5);
+			cv::line(main, P3, P4, cv::Scalar(0, 255, 0), 5);
+			cv::line(main, P4, P1, cv::Scalar(0, 255, 0), 5);
+		}
+
+		for (int i = 0; i < identifiedMarkers.size(); i++) {
+			int id = identifiedMarkers.at(i)._id;
+			std::vector<cv::Point>* contour = &identifiedMarkers.at(i)._contour;
+
+			cv::Point& P1 = contour->at(0);
+			cv::Point& P2 = contour->at(1);
+			cv::Point& P3 = contour->at(2);
+			cv::Point& P4 = contour->at(3);
+			cv::Point center = orga::getIntersection(orga::Line(&P1, &P3), orga::Line(&P2, &P4));
+			cv::Size text = cv::getTextSize(std::to_string(id), cv::FONT_HERSHEY_SIMPLEX, 0.75, 1, 0);
+			cv::rectangle(main, center + cv::Point(0, 0), center + cv::Point(text.width, -text.height), CV_RGB(0, 0, 0), CV_FILLED);
+			cv::putText(main, std::to_string(id), center, cv::FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(255, 255, 255), 1, 8);
+		}
 
 		cv::imshow("main", main);
+
+		cachedMarkers.swap(identifiedMarkers);
 
 		for (int i = 0; i < max; i++) {
 			std::vector<cv::Point*>* temp = &squareContours.at(i);
