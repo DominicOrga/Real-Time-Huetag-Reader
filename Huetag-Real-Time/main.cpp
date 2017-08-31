@@ -92,7 +92,7 @@ void assignMarkers() {
 	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[2500] = es;
 
-	/*orga::spritesheet sw;
+	orga::spritesheet sw;
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-0.png", CV_LOAD_IMAGE_UNCHANGED));
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
@@ -112,7 +112,7 @@ void assignMarkers() {
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
-	_images[25000] = sw;*/
+	_images[25000] = sw;
 
 }
 

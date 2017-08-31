@@ -9,7 +9,7 @@ namespace orga {
 		int _ctr = 0;
 
 	public:
-		std::vector<cv::Mat> _sprites;
+		std::vector<cv::Mat*> _sprites;
 
 		spritesheet();
 		~spritesheet();
