@@ -253,6 +253,7 @@ int main() {
 		cv::imshow("main", main);
 
 		cachedMarkers.swap(identifiedMarkers);
+		identifiedMarkers.clear();
 
 		for (int i = 0; i < max; i++) {
 			std::vector<cv::Point*>* temp = &squareContours.at(i);
