@@ -114,6 +114,29 @@ void assignMarkers() {
 	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[25000] = sw;
 
+	orga::spritesheet jugg;
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-10.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-15.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-16.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg.addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-20.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[250000] = jugg;
+
 }
 
 int main() {
