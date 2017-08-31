@@ -157,6 +157,7 @@
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="markerholder.cpp" />
+    <ClCompile Include="spritesheet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="huetagreader.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="markerholder.h" />
+    <ClInclude Include="spritesheet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -33,6 +33,9 @@
     <ClCompile Include="markerholder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="spritesheet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="huetagreader.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="markerholder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="spritesheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

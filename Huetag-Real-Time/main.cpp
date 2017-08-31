@@ -7,6 +7,7 @@
 #include "huetagreader.h"
 #include "markerholder.h"
 #include "line.h"
+#include "spritesheet.h"
 
 #define OUT
 
@@ -22,7 +23,7 @@ int _trackMinDistDiff = 50;
 
 int _showImage = 0;
 
-std::map<int, cv::Mat> _images;
+std::map<int, orga::spritesheet> _images;
 
 void onBlockSizeTrackbar(int, void*) {
 	if (_blockSizeSlider < 2) {
@@ -60,10 +61,59 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 }
 
 void assignMarkers() {
-	_images[14] = cv::imread("c:\\Huetag\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED);
-	_images[1014] = cv::imread("c:\\Huetag\\mirana.png", CV_LOAD_IMAGE_UNCHANGED);
-	_images[10014] = cv::imread("c:\\Huetag\\traxex.png", CV_LOAD_IMAGE_UNCHANGED);
-	_images[1000014] = cv::imread("c:\\Huetag\\magina.png", CV_LOAD_IMAGE_UNCHANGED);
+	_images[14] = orga::spritesheet(cv::imread("c:\\Huetag\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[1014] = orga::spritesheet(cv::imread("c:\\Huetag\\mirana.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[10014] = orga::spritesheet(cv::imread("c:\\Huetag\\traxex.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[1000014] = orga::spritesheet(cv::imread("c:\\Huetag\\magina.png", CV_LOAD_IMAGE_UNCHANGED));
+
+	orga::spritesheet phx;
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-10.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx.addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[250] = phx;
+
+	orga::spritesheet es;
+	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	es.addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[2500] = es;
+
+	/*orga::spritesheet sw;
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-0.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-15.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-16.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw.addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[25000] = sw;*/
+
 }
 
 int main() {
@@ -191,7 +241,7 @@ int main() {
 
 			if (id != -1) {				
 				identifiedMarkers.push_back(orga::markerholder(*squareContour, id));
-				std::cout << "Marker " << i << "identified" << std::endl;
+				std::cout << "Marker " << i << ": Identified" << std::endl;
 			}
 
 			int max1 = dataCellPoints.size();
@@ -226,21 +276,25 @@ int main() {
 			cv::Point center = orga::getIntersection(orga::Line(&P1, &P3), orga::Line(&P2, &P4));
 
 			if (_showImage) {
-				cv::Mat image = _images[id];
-				if (image.data) {
-					int w = image.size().width;
-					int h = image.size().height;
+				if (_images.find(id) != _images.end()) {
+					cv::Mat image;
+					_images[id].play(image);
 
-					std::vector<cv::Point> contour {P1, P2, P3, P4};
+					if (image.data) {
+						int w = image.size().width;
+						int h = image.size().height;
 
-					float area = cv::contourArea(contour);
+						std::vector<cv::Point> contour{ P1, P2, P3, P4 };
 
-					cv::resize(image, image, cv::Size(w * 0.3 * area / 12500, h * 0.3 * area / 12500));
-					w = image.size().width;
-					h = image.size().height;
+						float area = cv::contourArea(contour);
 
-					cv::Point imageCenter = cv::Point(center.x - w / 2, center.y - h / 2);
-					overlayImage(main, image, main, imageCenter);
+						cv::resize(image, image, cv::Size(w * 0.3 * area / 12500, h * 0.3 * area / 12500));
+						w = image.size().width;
+						h = image.size().height;
+
+						cv::Point imageCenter = cv::Point(center.x - w / 2, center.y - h / 2);
+						overlayImage(main, image, main, imageCenter);
+					}
 				}
 			}
 			else {

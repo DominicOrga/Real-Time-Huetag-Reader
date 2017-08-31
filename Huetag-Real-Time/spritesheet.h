@@ -5,10 +5,16 @@
 
 namespace orga {
 	class spritesheet {
-		std::vector<cv::Mat> _sprites;
+	private:
 		int _ctr = 0;
-		int _spriteCount = 0;
 
+	public:
+		std::vector<cv::Mat> _sprites;
+
+		spritesheet();
+		~spritesheet();
+
+		spritesheet(cv::Mat& sprite);
 		void addSprite(cv::Mat& sprite);
 		void play(cv::Mat& sprite);
 	};
