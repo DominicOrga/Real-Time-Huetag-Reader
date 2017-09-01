@@ -9,6 +9,8 @@
 #include "line.h"
 #include "spritesheet.h"
 #include "playablemedia.h"
+#include "videofile.h"
+#include <thread>
 
 #define OUT
 
@@ -51,6 +53,7 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 				break;
 
 			double opacity = ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3]) / 255.;
+			opacity = 1;
 
 			for (int c = 0; opacity > 0 && c < output.channels(); ++c) {
 				unsigned char foregroundPx = foreground.data[fY * foreground.step + fX * foreground.channels() + c];
@@ -62,6 +65,7 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 }
 
 void assignMarkers() {
+	//_images[14] = new orga::videofile("c:\\Huetag\\stick-figure-fight.mp4");
 	_images[14] = new orga::spritesheet(cv::imread("c:\\Huetag\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[1014] = new orga::spritesheet(cv::imread("c:\\Huetag\\mirana.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[10014] = new orga::spritesheet(cv::imread("c:\\Huetag\\traxex.png", CV_LOAD_IMAGE_UNCHANGED));
@@ -140,12 +144,15 @@ void assignMarkers() {
 
 }
 
+//cv::VideoCapture _cam(0);
+//cv::Mat _frame;
+
 int main() {
 	assignMarkers();
 
 	cv::VideoCapture cam(0);
 
-	if (!cam.isOpened())
+	if (!_cam.isOpened())
 		return -1;
 
 	cv::namedWindow("binary", CV_WINDOW_AUTOSIZE);
@@ -166,7 +173,14 @@ int main() {
 			_showImage = !_showImage;
 		}
 
-		cam >> frame;
+		//cam >> frame;
+		std::thread(_cam.read(frame));
+		
+
+		if (!frame.data) {
+			continue;
+		}
+
 		cv::flip(frame, OUT frame, 1);
 
 		cv::cvtColor(frame, OUT grayscale, CV_BGR2GRAY);
@@ -255,7 +269,7 @@ int main() {
 				}
 
 				identifiedMarkers.push_back(orga::markerholder(*squareContour, nearestCachedContour->_id));
-				std::cout << "Marker " << i << ": Tracked" << std::endl;
+				//std::cout << "Marker " << i << ": Tracked" << std::endl;
 				continue;
 			}
 
@@ -268,7 +282,7 @@ int main() {
 
 			if (id != -1) {				
 				identifiedMarkers.push_back(orga::markerholder(*squareContour, id));
-				std::cout << "Marker " << i << ": Identified" << std::endl;
+				//std::cout << "Marker " << i << ": Identified" << std::endl;
 			}
 
 			int max1 = dataCellPoints.size();

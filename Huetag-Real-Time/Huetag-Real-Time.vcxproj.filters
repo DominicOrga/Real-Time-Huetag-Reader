@@ -36,6 +36,9 @@
     <ClCompile Include="spritesheet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="videofile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="huetagreader.h">
@@ -57,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="playablemedia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="videofile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
