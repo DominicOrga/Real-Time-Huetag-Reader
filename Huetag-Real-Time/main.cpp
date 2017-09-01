@@ -169,10 +169,6 @@ int main() {
 
 	cv::Mat frame;
 	while (1) {
-		if (_kbhit() && _getch() == 's') {
-			_showImage = !_showImage;
-		}
-
 		cam >> frame;
 
 		cv::flip(frame, OUT frame, 1);
