@@ -37,7 +37,7 @@ void onBlockSizeTrackbar(int, void*) {
 	_blockSizeSlider = (_blockSizeSlider % 2 == 0) ? _blockSizeSlider + 1 : _blockSizeSlider;
 }
 
-void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat &output, cv::Point2i location) {
+void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat &output, cv::Point2i location, bool isOpaqeue = true) {
 	background.copyTo(output);
 
 	for (int y = std::max(location.y, 0); y < background.rows; ++y) {
@@ -52,8 +52,7 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 			if (fX >= foreground.cols)
 				break;
 
-			double opacity = ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3]) / 255.;
-			opacity = 1;
+			double opacity = (isOpaqeue) ? ((double)foreground.data[fY * foreground.step + fX * foreground.channels() + 3]) / 255. : 1;
 
 			for (int c = 0; opacity > 0 && c < output.channels(); ++c) {
 				unsigned char foregroundPx = foreground.data[fY * foreground.step + fX * foreground.channels() + c];
@@ -65,7 +64,8 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 }
 
 void assignMarkers() {
-	//_images[14] = new orga::videofile("c:\\Huetag\\stick-figure-fight.mp4");
+	_images[2012] = new orga::videofile("c:\\Huetag\\LoL.mp4");
+
 	_images[14] = new orga::spritesheet(cv::imread("c:\\Huetag\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[1014] = new orga::spritesheet(cv::imread("c:\\Huetag\\mirana.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[10014] = new orga::spritesheet(cv::imread("c:\\Huetag\\traxex.png", CV_LOAD_IMAGE_UNCHANGED));
@@ -143,9 +143,6 @@ void assignMarkers() {
 	_images[250000] = jugg;
 
 }
-
-//cv::VideoCapture cam(0);
-//cv::Mat _frame;
 
 int main() {
 	assignMarkers();
@@ -324,7 +321,8 @@ int main() {
 						h = image.size().height;
 
 						cv::Point imageCenter = cv::Point(center.x - w / 2, center.y - h / 2);
-						overlayImage(main, image, main, imageCenter);
+
+						overlayImage(main, image, main, imageCenter, !(dynamic_cast<orga::videofile*>(_images[id])));
 					}
 				}
 			}

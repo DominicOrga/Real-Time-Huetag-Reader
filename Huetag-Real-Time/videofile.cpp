@@ -7,16 +7,17 @@
 
 namespace orga {
 	videofile::videofile(std::string videoPath) {
-		_video = new cv::VideoCapture(videoPath);
-		_frameCount = _video->get(CV_CAP_PROP_FRAME_COUNT);
+		_video = cv::VideoCapture(videoPath);
 	}
 
 	void videofile::play(cv::Mat& OUT frame) {
-		if (!_video) return;
+		if (!_video.isOpened()) return;
 
-		//_frameCurrent += (_frameCurrent >= _frameCount - 1 - _frameSkip) ? -_frameCurrent : 1 + _frameSkip;
+		_video.read(frame);
 
-		//_video->set(CV_CAP_PROP_POS_FRAMES, _frameCurrent);
-		_video->read(frame);
+		if (!frame.data) {
+			_video.set(CV_CAP_PROP_POS_FRAMES, 0);
+			_video.read(frame)
+		}
 	}
 }

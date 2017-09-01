@@ -10,10 +10,7 @@
 namespace orga {
 	class videofile : public playablemedia {
 	private:
-		cv::VideoCapture* _video;
-		double _frameCount;
-		double _frameCurrent = 0;
-		int _frameSkip = 0;
+		cv::VideoCapture _video;
 
 	public:
 		videofile(std::string videoPath);

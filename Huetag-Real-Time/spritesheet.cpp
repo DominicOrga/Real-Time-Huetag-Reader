@@ -14,9 +14,7 @@ namespace orga {
 	}
 
 	void spritesheet::play(cv::Mat& OUT sprite) {
-
 		_ctr += (_ctr == _sprites.size() - 1) ? -_ctr : 1;
-
 		sprite = _sprites.at(_ctr);
 	}
 }
