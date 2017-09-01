@@ -56,5 +56,8 @@
     <ClInclude Include="spritesheet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="playablemedia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

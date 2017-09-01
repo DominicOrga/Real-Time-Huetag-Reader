@@ -5,13 +5,6 @@ namespace orga {
 
 	spritesheet::spritesheet() {}
 
-	spritesheet::~spritesheet() {
-		/*for (int i = 0; i < _sprites.size(); i++) {
-			delete _sprites[i];
-		}*/
-	}
-
-
 	spritesheet::spritesheet(cv::Mat& sprite) {
 		addSprite(sprite);
 	}
@@ -20,7 +13,7 @@ namespace orga {
 		_sprites.push_back(new cv::Mat(sprite));
 	}
 
-	void spritesheet::play(cv::Mat& sprite) {
+	void spritesheet::play(cv::Mat& OUT sprite) {
 
 		_ctr += (_ctr == _sprites.size() - 1) ? -_ctr : 1;
 

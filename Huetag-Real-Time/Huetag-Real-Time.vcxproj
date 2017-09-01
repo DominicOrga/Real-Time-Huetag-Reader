@@ -165,6 +165,7 @@
     <ClInclude Include="huetagreader.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="markerholder.h" />
+    <ClInclude Include="playablemedia.h" />
     <ClInclude Include="spritesheet.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
