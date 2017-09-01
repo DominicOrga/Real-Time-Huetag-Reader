@@ -17,7 +17,7 @@ namespace orga {
 
 		if (!frame.data) {
 			_video.set(CV_CAP_PROP_POS_FRAMES, 0);
-			_video.read(frame)
+			_video.read(frame);
 		}
 	}
 }
