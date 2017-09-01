@@ -144,7 +144,7 @@ void assignMarkers() {
 
 }
 
-//cv::VideoCapture _cam(0);
+//cv::VideoCapture cam(0);
 //cv::Mat _frame;
 
 int main() {
@@ -152,7 +152,7 @@ int main() {
 
 	cv::VideoCapture cam(0);
 
-	if (!_cam.isOpened())
+	if (!cam.isOpened())
 		return -1;
 
 	cv::namedWindow("binary", CV_WINDOW_AUTOSIZE);
@@ -174,7 +174,7 @@ int main() {
 		}
 
 		//cam >> frame;
-		std::thread(_cam.read(frame));
+		std::thread(cam.read(frame));
 		
 
 		if (!frame.data) {
