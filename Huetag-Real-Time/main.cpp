@@ -173,13 +173,7 @@ int main() {
 			_showImage = !_showImage;
 		}
 
-		//cam >> frame;
-		std::thread(cam.read(frame));
-		
-
-		if (!frame.data) {
-			continue;
-		}
+		cam >> frame;
 
 		cv::flip(frame, OUT frame, 1);
 

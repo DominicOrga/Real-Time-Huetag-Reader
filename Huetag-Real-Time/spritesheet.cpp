@@ -10,13 +10,13 @@ namespace orga {
 	}
 
 	void spritesheet::addSprite(cv::Mat& sprite) {
-		_sprites.push_back(new cv::Mat(sprite));
+		_sprites.push_back(cv::Mat(sprite));
 	}
 
 	void spritesheet::play(cv::Mat& OUT sprite) {
 
 		_ctr += (_ctr == _sprites.size() - 1) ? -_ctr : 1;
 
-		sprite = *_sprites.at(_ctr);
+		sprite = _sprites.at(_ctr);
 	}
 }
