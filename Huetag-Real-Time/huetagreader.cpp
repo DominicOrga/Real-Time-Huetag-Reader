@@ -178,13 +178,16 @@ namespace orga
 				cv::Point p = *dataCellCoords.at(i);
 
 				// Extract rgb.
-				cv::Vec3b color = image->at<cv::Vec3b>(p.y < 0 ? 0 : p.y, p.x < 0 ? 0 : p.x);
+				if (p.x < image->size().width && p.y < image->size().height) {
+					cv::Vec3b color = image->at<cv::Vec3b>(p.y < 0 ? 0 : p.y, p.x < 0 ? 0 : p.x);
+					orga::RGB rgb{ (float)color[2], (float)color[1], (float)color[0] };
+					orga::Lab lab = orga::RGBToLab(rgb);
 
-				// Convert rgb to Lab.
-				orga::RGB rgb{ (float) color[2], (float) color[1], (float) color[0] };
-				orga::Lab lab = orga::RGBToLab(rgb);
-
-				outLabArray.push_back(lab);
+					outLabArray.push_back(lab);
+				}
+				else {
+					outLabArray.push_back(orga::Lab{ 0, 0, 0 });
+				}
 			}
 		}
 

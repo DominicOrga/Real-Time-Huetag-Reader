@@ -1,18 +1,23 @@
-#include "opencv2\opencv.hpp"
-#include "opencv2/highgui.hpp"
+
+#include <windows.h>
 #include <vector>
 #include <iostream>
 #include <cmath>
 #include <conio.h>	
+#include <regex>
+
+#include "opencv2\opencv.hpp"
+#include "opencv2\highgui.hpp"
 #include "huetagreader.h"
 #include "markerholder.h"
 #include "line.h"
 #include "spritesheet.h"
 #include "playablemedia.h"
 #include "videofile.h"
-#include <thread>
 
 #define OUT
+
+using namespace std;
 
 int _blockSizeSlider = 255;
 const int _blockSizeSliderMax = 255;
@@ -40,13 +45,13 @@ void onBlockSizeTrackbar(int, void*) {
 void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat &output, cv::Point2i location, bool isOpaqeue = true) {
 	background.copyTo(output);
 
-	for (int y = std::max(location.y, 0); y < background.rows; ++y) {
+	for (int y = max(location.y, 0); y < background.rows; ++y) {
 		int fY = y - location.y; 
 
 		if (fY >= foreground.rows)
 			break;
 
-		for (int x = std::max(location.x, 0); x < background.cols; ++x) {
+		for (int x = max(location.x, 0); x < background.cols; ++x) {
 			int fX = x - location.x; 
 
 			if (fX >= foreground.cols)
@@ -63,83 +68,94 @@ void overlayImage(const cv::Mat &background, const cv::Mat &foreground, cv::Mat 
 	}
 }
 
-void assignMarkers() {
-	_images[2012] = new orga::videofile("c:\\Huetag\\LoL.mp4");
+std::string getProjectPath() {
+	char buffer[MAX_PATH];
+	GetModuleFileNameA(NULL, buffer, MAX_PATH);
+	std::string::size_type pos = string(buffer).find_last_of("\\/");
+	std::string s = string(buffer).substr(0, pos);
+	std::regex e("\\\\");
 
-	_images[14] = new orga::spritesheet(cv::imread("c:\\Huetag\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED));
-	_images[1014] = new orga::spritesheet(cv::imread("c:\\Huetag\\mirana.png", CV_LOAD_IMAGE_UNCHANGED));
-	_images[10014] = new orga::spritesheet(cv::imread("c:\\Huetag\\traxex.png", CV_LOAD_IMAGE_UNCHANGED));
-	_images[1000014] = new orga::spritesheet(cv::imread("c:\\Huetag\\magina.png", CV_LOAD_IMAGE_UNCHANGED));
+	return regex_replace(s, e, "\\\\");
+}
+
+// Assign objects to huetags
+void assignMarkers() {
+	std::string projectPath = getProjectPath();
+
+	_images[14] = new orga::spritesheet(cv::imread(projectPath + "\\marker-assets\\yurnero.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[1014] = new orga::spritesheet(cv::imread(projectPath + "\\marker-assets\\mirana.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[10014] = new orga::spritesheet(cv::imread(projectPath + "\\marker-assets\\traxex.png", CV_LOAD_IMAGE_UNCHANGED));
+	_images[1000014] = new orga::spritesheet(cv::imread(projectPath + "\\marker-assets\\magina.png", CV_LOAD_IMAGE_UNCHANGED));
 
 	orga::spritesheet* phx = new orga::spritesheet;
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-10.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
-	phx->addSprite(cv::imread("c:\\Huetag\\phx-anim\\phx-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-10.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
+	phx->addSprite(cv::imread(projectPath + "\\marker-assets\\phx-anim\\phx-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[250] = phx;
 
 	orga::spritesheet* es = new orga::spritesheet();
-	es->addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
-	es->addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
-	es->addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
-	es->addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
-	es->addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
-	es->addSprite(cv::imread("c:\\Huetag\\es-anim\\es-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	es->addSprite(cv::imread(projectPath + "\\marker-assets\\es-anim\\es-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	es->addSprite(cv::imread(projectPath + "\\marker-assets\\es-anim\\es-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	es->addSprite(cv::imread(projectPath + "\\marker-assets\\es-anim\\es-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	es->addSprite(cv::imread(projectPath + "\\marker-assets\\es-anim\\es-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	es->addSprite(cv::imread(projectPath + "\\marker-assets\\es-anim\\es-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	es->addSprite(cv::imread(projectPath + "\\marker-assets\\es-anim\\es-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[2500] = es;
 
 	orga::spritesheet* sw = new orga::spritesheet();
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-0.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-15.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-16.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
-	sw->addSprite(cv::imread("c:\\Huetag\\sw-anim\\sw-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-0.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-15.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-16.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
+	sw->addSprite(cv::imread(projectPath + "\\marker-assets\\sw-anim\\sw-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[25000] = sw;
 
 	orga::spritesheet* jugg = new orga::spritesheet();
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-10.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-15.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-16.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
-	jugg->addSprite(cv::imread("c:\\Huetag\\jugg-anim\\jugg-frame-20.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-1.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-2.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-3.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-4.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-5.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-6.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-7.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-8.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-9.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-10.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-11.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-12.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-13.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-14.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-15.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-16.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-17.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-18.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-19.png", CV_LOAD_IMAGE_UNCHANGED));
+	jugg->addSprite(cv::imread(projectPath + "\\marker-assets\\jugg-anim\\jugg-frame-20.png", CV_LOAD_IMAGE_UNCHANGED));
 	_images[250000] = jugg;
 
 }
