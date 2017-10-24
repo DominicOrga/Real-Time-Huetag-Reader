@@ -1,10 +1,10 @@
 # Real-Time-Huetag-Reader-Prototype
 An application demonstrating the Huetag Marker system based on the algorithms discussed in its research paper as a proof of concept.
 
-# Standalone Application
-Available: Huetag-Real-Time\x64\Debug\Huetag-Real-Time
+## Standalone Application
+Available: "x64\Debug\Huetag-Real-Time.exe"
 
-# Prerequisites
+## Prerequisites
 The project requires the installation of the following software tools:
 
 1. Qt (version 5.9 recommended)
